@@ -8,8 +8,8 @@ public class SearchServiceImpl implements SearchService {
 
     private ElasticClient elastic;
 
-    public SearchServiceImpl() {
-        this.elastic = new ElasticClient();
+    public SearchServiceImpl(ElasticClient ec) {
+        this.elastic = ec;
     }
 
     @Override

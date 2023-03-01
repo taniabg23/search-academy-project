@@ -1,5 +1,6 @@
 package co.empathy.academy.search.controllers;
 
+import co.empathy.academy.search.ElasticClient;
 import co.empathy.academy.search.services.SearchService;
 import co.empathy.academy.search.services.SearchServiceImpl;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,7 +13,7 @@ public class SearchController {
     private SearchService searchService;
 
     public SearchController() {
-        this.searchService = new SearchServiceImpl();
+        this.searchService = new SearchServiceImpl(new ElasticClient());
     }
 
     @RequestMapping("/search")
