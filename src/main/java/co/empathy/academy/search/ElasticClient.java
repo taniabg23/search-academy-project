@@ -6,21 +6,22 @@ import co.elastic.clients.transport.ElasticsearchTransport;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
 import org.apache.http.HttpHost;
 import org.elasticsearch.client.RestClient;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
+@Component
 public class ElasticClient {
-    private RestClient restClient;
-    private ElasticsearchTransport transport;
+
     private ElasticsearchClient client;
 
-    public ElasticClient() {
+    private void createConnection() {
         // Create the low-level client
-        restClient = RestClient.builder(
+        RestClient restClient = RestClient.builder(
                 new HttpHost("localhost", 9200)).build();
 
         // Create the transport with a Jackson mapper
-        transport = new RestClientTransport(
+        ElasticsearchTransport transport = new RestClientTransport(
                 restClient, new JacksonJsonpMapper());
 
         // And create the API client
@@ -28,7 +29,12 @@ public class ElasticClient {
     }
 
 
-    public String getClusterName() throws IOException {
-        return client.cluster().state().valueBody().toJson().asJsonObject().getString("cluster_name");
+    public String getClusterName() {
+        createConnection();
+        try {
+            return client.cluster().state().valueBody().toJson().asJsonObject().getString("cluster_name");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

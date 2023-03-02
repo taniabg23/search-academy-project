@@ -7,8 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.io.IOException;
-
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 public class SearchServiceImplTest {
@@ -24,9 +23,9 @@ public class SearchServiceImplTest {
     }
 
     @Test
-    void givenQuery_whenSearch_thenReturnJson() throws IOException {
-        String cn = ec.getClusterName();
-        when(searchService.getJsonQueryAndClusterName("abc")).thenReturn("{\n\t\"query\": \"abc\",\n\t\"clusterName\": \"" + cn + "\"\n}");
+    void givenQuery_whenSearch_thenReturnJson() {
+        when(ec.getClusterName()).thenReturn("docker-cluster");
+        assertEquals("{\n\t\"query\": \"abc\",\n\t\"clusterName\": \"docker-cluster\"\n}", searchService.getJsonQueryAndClusterName("abc"));
     }
 
 

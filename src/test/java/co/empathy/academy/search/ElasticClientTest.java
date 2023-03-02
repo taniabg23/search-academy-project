@@ -2,16 +2,16 @@ package co.empathy.academy.search;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
+import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 
 import java.io.IOException;
 
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ElasticClientTest {
 
-    @Mock
+    @InjectMocks
     private ElasticClient elasticClient;
 
     @BeforeEach
@@ -21,6 +21,6 @@ public class ElasticClientTest {
 
     @Test
     void givenNothing_whenGetClusterName_thenReturnClusterName() throws IOException {
-        when(elasticClient.getClusterName()).thenReturn("docker-cluster");
+        assertEquals("docker-cluster", elasticClient.getClusterName());
     }
 }
