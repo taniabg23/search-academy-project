@@ -1,29 +1,40 @@
 package co.empathy.academy.search.services;
 
 import co.empathy.academy.search.model.User;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class UserService {
 
-    @Autowired
-    private ConcurrentHashMap<String, User> users;
+    private ConcurrentHashMap<Long, User> users = new ConcurrentHashMap<>();
+
+    public List<User> getUsers() {
+        List<User> allUsers = new LinkedList<>();
+        users.forEach((id, user) -> allUsers.add(users.get(id)));
+        return allUsers;
+    }
+
+    //TODO comprobar datos
+    public User getUserById(Long id) {
+        return users.get(id);
+    }
 
     //TODO comprobar que el user y id existen
-    public void addUser(User user) {
-        this.users.put(user.getId(), user);
+    public User addUser(User user) {
+        return this.users.put(user.getId(), user);
     }
 
     //TODO comprobar si existe el usuario y el id
-    public void deleteUser(User user) {
-        this.users.remove(user.getId());
+    public User deleteUser(Long id) {
+        return this.users.remove(id);
     }
 
     //TODO comprobar si existe el usuario y el id
-    public void updateUser(User user) {
-        this.users.replace(user.getId(), user);
+    public User updateUser(Long id, User user) {
+        return this.users.replace(id, user);
     }
 }
