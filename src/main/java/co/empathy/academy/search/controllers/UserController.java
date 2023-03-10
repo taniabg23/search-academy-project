@@ -22,7 +22,7 @@ public class UserController {
     }
 
     @GetMapping("users/details/{id}")
-    public ResponseEntity<User> getUser(@PathVariable Long id) {
+    public ResponseEntity<User> getUserById(@PathVariable Long id) {
         User user = this.userService.getUserById(id);
         return user == null ?
                 ResponseEntity.status(HttpStatus.NOT_FOUND).build()
@@ -37,7 +37,7 @@ public class UserController {
                 : ResponseEntity.status(HttpStatus.CONFLICT).build();
     }
 
-    @GetMapping("/users/edit/{id}")
+    @PutMapping("/users/edit/{id}")
     public ResponseEntity<User> updateUser(@PathVariable Long idO, @RequestBody User userR) {
         User user = this.userService.updateUser(idO, userR);
         return user == null ?
@@ -45,11 +45,11 @@ public class UserController {
                 : ResponseEntity.status(HttpStatus.OK).body(user);
     }
 
-    @GetMapping("/users/delete/{id}")
+    @DeleteMapping("/users/delete/{id}")
     public ResponseEntity<User> deleteUser(@PathVariable Long id) {
         User user = this.userService.deleteUser(id);
         return user == null ?
                 ResponseEntity.status(HttpStatus.NOT_FOUND).build()
-                : ResponseEntity.status(HttpStatus.OK).body(user);
+                : ResponseEntity.status(HttpStatus.OK).build();
     }
 }
