@@ -35,7 +35,7 @@ public class UserController {
     })
     @Parameter(name = "id", required = true, description = "ID of the user you want to get")
     @GetMapping("users/details/{id}")
-    public ResponseEntity<User> getUser(@PathVariable Long id) {
+    public ResponseEntity<User> getUserById(@PathVariable Long id) {
         User user = this.userService.getUserById(id);
         return user == null ?
                 ResponseEntity.status(HttpStatus.NOT_FOUND).build()
@@ -71,7 +71,7 @@ public class UserController {
             @Parameter(name = "name", required = true, description = "New name for the user"),
             @Parameter(name = "email", required = true, description = "New email for the user")
     })
-    @GetMapping("/users/edit/{id}")
+    @PutMapping("/users/edit/{id}")
     public ResponseEntity<User> updateUser(@PathVariable Long idO, @RequestBody User userR) {
         User user = this.userService.updateUser(idO, userR);
         return user == null ?
@@ -85,11 +85,11 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "Not found")
     })
     @Parameter(name = "id", required = true, description = "ID of the user you want to delete")
-    @GetMapping("/users/delete/{id}")
+    @DeleteMapping("/users/delete/{id}")
     public ResponseEntity<User> deleteUser(@PathVariable Long id) {
         User user = this.userService.deleteUser(id);
         return user == null ?
                 ResponseEntity.status(HttpStatus.NOT_FOUND).build()
-                : ResponseEntity.status(HttpStatus.OK).body(user);
+                : ResponseEntity.status(HttpStatus.OK).build();
     }
 }
