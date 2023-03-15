@@ -1,8 +1,12 @@
 package co.empathy.academy.search.services;
 
 import co.empathy.academy.search.model.User;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -18,23 +22,26 @@ public class UserService {
         return allUsers;
     }
 
-    //TODO comprobar datos
     public User getUserById(Long id) {
         return users.get(id);
     }
 
-    //TODO comprobar que el user y id existen
     public User addUser(User user) {
         return this.users.put(user.getId(), user);
     }
 
-    //TODO comprobar si existe el usuario y el id
     public User deleteUser(Long id) {
         return this.users.remove(id);
     }
 
-    //TODO comprobar si existe el usuario y el id
     public User updateUser(Long id, User user) {
         return this.users.replace(id, user);
+    }
+
+    public List<User> saveUsers(MultipartFile file) throws IOException {
+        List<User> users = new ObjectMapper().readValue(file.getBytes(), new TypeReference<List<User>>() {
+        });
+        users.forEach(this::addUser);
+        return users;
     }
 }
