@@ -48,9 +48,9 @@ public class UserController {
         }
     }
 
-    @PutMapping("/users/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long idO, @RequestBody User userR) {
-        User user = this.userService.updateUser(idO, userR);
+    @PutMapping("/users")
+    public ResponseEntity<User> updateUser(@RequestBody User userR) {
+        User user = this.userService.updateUser(userR);
         return user == null ?
                 ResponseEntity.status(HttpStatus.NOT_FOUND).build()
                 : ResponseEntity.status(HttpStatus.OK).body(user);

@@ -34,8 +34,12 @@ public class UserService {
         return this.users.remove(id);
     }
 
-    public User updateUser(Long id, User user) {
-        return this.users.replace(id, user);
+    public User updateUser(User user) {
+        if (this.users.containsKey(user.getId())) {
+            this.users.replace(user.getId(), user);
+            return user;
+        }
+        return null;
     }
 
     public List<User> saveUsers(MultipartFile file) throws IOException {
