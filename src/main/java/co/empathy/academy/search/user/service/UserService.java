@@ -27,7 +27,11 @@ public class UserService {
     }
 
     public User addUser(User user) {
-        return this.users.put(user.getId(), user);
+        if (!this.users.containsKey(user.getId())) {
+            this.users.put(user.getId(), user);
+            return user;
+        }
+        return null;
     }
 
     public User deleteUser(Long id) {

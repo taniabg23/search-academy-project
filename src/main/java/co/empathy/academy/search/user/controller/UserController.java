@@ -34,8 +34,8 @@ public class UserController {
     public ResponseEntity<User> addUser(@RequestBody User userR) {
         User user = this.userService.addUser(userR);
         return user == null ?
-                ResponseEntity.status(HttpStatus.CREATED).body(userR)
-                : ResponseEntity.status(HttpStatus.CONFLICT).build();
+                ResponseEntity.status(HttpStatus.CONFLICT).build()
+                : ResponseEntity.status(HttpStatus.CREATED).body(user);
     }
 
     @PostMapping("/users/addfile")
