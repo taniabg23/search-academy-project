@@ -126,6 +126,43 @@ public class UserControllerTest {
     }
 
     @Test
+    void givenNoUsers_whenDeleteUserThatDoesntExist_thenReturnsNotFoundStatus() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.delete("/users/{id}", 1))
+                .andExpect(MockMvcResultMatchers.status().isNotFound());
+    }
+
+    @Test
+    void givenOneUser_whenDeleteUserThatDoesntExist_thenReturnsNotFoundStatus() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/users")
+                        .content("{\"id\":1,\"name\":\"user1\",\"email\":\"user1@email\"}")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isCreated())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("user1"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.email").value("user1@email"));
+
+        mvc.perform(MockMvcRequestBuilders.delete("/users/{id}", 2))
+                .andExpect(MockMvcResultMatchers.status().isNotFound());
+    }
+
+    @Test
+    void givenOneUser_whenDeleteUserThatExists_thenReturnsTheUser() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/users")
+                        .content("{\"id\":1,\"name\":\"user1\",\"email\":\"user1@email\"}")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isCreated())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("user1"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.email").value("user1@email"));
+
+        mvc.perform(MockMvcRequestBuilders.delete("/users/{id}", 1))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("user1"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.email").value("user1@email"));
+    }
+
+    @Test
     void givenNoUsers_whenAskForAllUsers_thenReturnsEmptyList() throws Exception {
         mvc.perform(MockMvcRequestBuilders.get("/users"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
