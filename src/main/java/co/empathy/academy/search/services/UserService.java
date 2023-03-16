@@ -39,7 +39,7 @@ public class UserService {
     }
 
     public List<User> saveUsers(MultipartFile file) throws IOException {
-        List<User> users = new ObjectMapper().readValue(file.getBytes(), new TypeReference<List<User>>() {
+        List<User> users = new ObjectMapper().readValue(file.getBytes(), new TypeReference<>() {
         });
         users.forEach(this::addUser);
         return users;

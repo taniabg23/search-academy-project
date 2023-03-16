@@ -61,6 +61,6 @@ public class UserController {
         User user = this.userService.deleteUser(id);
         return user == null ?
                 ResponseEntity.status(HttpStatus.NOT_FOUND).build()
-                : ResponseEntity.status(HttpStatus.OK).build();
+                : ResponseEntity.status(HttpStatus.OK).body(user);
     }
 }
