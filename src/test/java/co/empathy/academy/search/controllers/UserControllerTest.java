@@ -1,5 +1,6 @@
 package co.empathy.academy.search.controllers;
 
+import co.empathy.academy.search.user.controller.UserController;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;

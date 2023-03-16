@@ -1,4 +1,4 @@
-package co.empathy.academy.search.model;
+package co.empathy.academy.search.user.model;
 
 public class User {
     private Long id;

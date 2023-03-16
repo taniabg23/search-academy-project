@@ -1,7 +1,7 @@
-package co.empathy.academy.search.controllers;
+package co.empathy.academy.search.user.controller;
 
-import co.empathy.academy.search.model.User;
-import co.empathy.academy.search.services.UserService;
+import co.empathy.academy.search.user.model.User;
+import co.empathy.academy.search.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -1,5 +1,6 @@
 package co.empathy.academy.search;
 
+import co.empathy.academy.search.util.ElasticClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;

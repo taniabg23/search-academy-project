@@ -1,6 +1,6 @@
-package co.empathy.academy.search.services;
+package co.empathy.academy.search.user.service;
 
-import co.empathy.academy.search.model.User;
+import co.empathy.academy.search.user.model.User;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
