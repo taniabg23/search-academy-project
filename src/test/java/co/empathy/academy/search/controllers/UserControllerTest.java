@@ -19,6 +19,33 @@ public class UserControllerTest {
     private UserController userController;
 
     @Test
+    void givenNoUsers_whenAddNewUser_thenReturnsTheUserAdded() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/users")
+                        .content("{\"id\":1,\"name\":\"user1\",\"email\":\"user1@email\"}")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isCreated())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("user1"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.email").value("user1@email"));
+    }
+
+    @Test
+    void givenOneUser_whenAddRepeatedUser_thenReturnsConflictStatus() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/users")
+                        .content("{\"id\":1,\"name\":\"user1\",\"email\":\"user1@email\"}")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isCreated())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("user1"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.email").value("user1@email"));
+
+        mvc.perform(MockMvcRequestBuilders.post("/users")
+                        .content("{\"id\":1,\"name\":\"user1\",\"email\":\"user1@email\"}")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isConflict());
+    }
+
+    @Test
     void givenNoUsers_whenAskForAllUsers_thenReturnsEmptyList() throws Exception {
         mvc.perform(MockMvcRequestBuilders.get("/users"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
