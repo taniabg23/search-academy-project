@@ -5,6 +5,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public interface UserService {
     public List<User> getUsers();
@@ -18,4 +19,6 @@ public interface UserService {
     public User updateUser(User user);
 
     public List<User> saveUsers(MultipartFile file) throws IOException;
+
+    public CompletableFuture<List<User>> saveUsersAsync(MultipartFile file) throws IOException;
 }

@@ -9,20 +9,22 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @RestController
+@RequestMapping("/users")
 public class UserController {
 
     @Autowired
     private UserService userService;
 
-    @GetMapping("/users")
+    @GetMapping("")
     public ResponseEntity<List<User>> getUsers() {
         List<User> users = this.userService.getUsers();
         return ResponseEntity.status(HttpStatus.OK).body(users);
     }
 
-    @GetMapping("users/{id}")
+    @GetMapping("{id}")
     public ResponseEntity<User> getUserById(@PathVariable Long id) {
         User user = this.userService.getUserById(id);
         return user == null ?
@@ -30,7 +32,7 @@ public class UserController {
                 : ResponseEntity.status(HttpStatus.OK).body(user);
     }
 
-    @PostMapping("/users")
+    @PostMapping("")
     public ResponseEntity<User> addUser(@RequestBody User userR) {
         User user = this.userService.addUser(userR);
         return user == null ?
@@ -38,7 +40,7 @@ public class UserController {
                 : ResponseEntity.status(HttpStatus.CREATED).body(user);
     }
 
-    @PostMapping("/users/addfile")
+    @PostMapping("/file")
     public ResponseEntity<List<User>> addUsersDataFile(@RequestParam MultipartFile file) {
         try {
             List<User> users = this.userService.saveUsers(file);
@@ -48,7 +50,17 @@ public class UserController {
         }
     }
 
-    @PutMapping("/users")
+    @PostMapping("/asyncfile")
+    public ResponseEntity<CompletableFuture<List<User>>> addUsersDataFileAsync(@RequestParam MultipartFile file) {
+        try {
+            CompletableFuture<List<User>> users = this.userService.saveUsersAsync(file);
+            return ResponseEntity.status(HttpStatus.OK).body(users);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PutMapping("")
     public ResponseEntity<User> updateUser(@RequestBody User userR) {
         User user = this.userService.updateUser(userR);
         return user == null ?
@@ -56,7 +68,7 @@ public class UserController {
                 : ResponseEntity.status(HttpStatus.OK).body(user);
     }
 
-    @DeleteMapping("/users/{id}")
+    @DeleteMapping("{id}")
     public ResponseEntity<User> deleteUser(@PathVariable Long id) {
         User user = this.userService.deleteUser(id);
         return user == null ?
