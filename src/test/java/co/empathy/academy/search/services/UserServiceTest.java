@@ -1,7 +1,7 @@
 package co.empathy.academy.search.services;
 
 import co.empathy.academy.search.user.model.User;
-import co.empathy.academy.search.user.service.UserService;
+import co.empathy.academy.search.user.service.UserServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -14,11 +14,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class UserServiceTest {
 
     @InjectMocks
-    private UserService userService;
+    private UserServiceImpl userService;
 
     @BeforeEach
     void setUP() {
-        this.userService = new UserService();
+        this.userService = new UserServiceImpl();
     }
 
     @Test
