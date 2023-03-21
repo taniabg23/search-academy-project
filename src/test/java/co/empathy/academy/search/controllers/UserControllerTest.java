@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -186,5 +187,30 @@ public class UserControllerTest {
                         "\"name\":" + "\"user16\"" + "," +
                         "\"email\":" + "\"user16@email\"" +
                         "}]"));
+    }
+
+    @Test
+    void givenNoUser_whenAddUserWithFile_thenReturnsUsersData() throws Exception {
+        String content = "[{" +
+                "\"id\":17," +
+                "\"name\":\"user17\"," +
+                "\"email\":\"user17@email.com\"" +
+                "}," +
+                "{" +
+                "\"id\":18," +
+                "\"name\":\"user18\"," +
+                "\"email\":\"user18@email.com\"" +
+                "}," +
+                "{" +
+                "\"id\":19," +
+                "\"name\":\"user19\"," +
+                "\"email\":\"user19@email.com\"" +
+                "}]";
+        MockMultipartFile file = new MockMultipartFile("file", "users.json",
+                MediaType.APPLICATION_JSON.getType(), content.getBytes());
+
+        mvc.perform(MockMvcRequestBuilders.multipart("/users/file").file(file))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().json(content));
     }
 }
