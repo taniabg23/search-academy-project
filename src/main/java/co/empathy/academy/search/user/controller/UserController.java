@@ -1,5 +1,7 @@
 package co.empathy.academy.search.user.controller;
 
+import co.empathy.academy.search.exceptions.RepeatedUserException;
+import co.empathy.academy.search.exceptions.UserNotFoundException;
 import co.empathy.academy.search.user.model.User;
 import co.empathy.academy.search.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -38,11 +40,9 @@ public class UserController {
     })
     @Parameter(name = "id", required = true, description = "ID of the user you want to get")
     @GetMapping("{id}")
-    public ResponseEntity<User> getUserById(@PathVariable Long id) {
+    public ResponseEntity<User> getUserById(@PathVariable Long id) throws UserNotFoundException {
         User user = this.userService.getUserById(id);
-        return user == null ?
-                ResponseEntity.status(HttpStatus.NOT_FOUND).build()
-                : ResponseEntity.status(HttpStatus.OK).body(user);
+        return ResponseEntity.status(HttpStatus.OK).body(user);
     }
 
     @Operation(summary = "Create a new user")
@@ -56,11 +56,9 @@ public class UserController {
             @Parameter(name = "email", required = true, description = "Email of the user you want to create")
     })
     @PostMapping("")
-    public ResponseEntity<User> addUser(@RequestBody User userR) {
+    public ResponseEntity<User> addUser(@RequestBody User userR) throws RepeatedUserException {
         User user = this.userService.addUser(userR);
-        return user == null ?
-                ResponseEntity.status(HttpStatus.CONFLICT).build()
-                : ResponseEntity.status(HttpStatus.CREATED).body(user);
+        return ResponseEntity.status(HttpStatus.CREATED).body(user);
     }
 
     @Operation(summary = "Create new users with the data stored in a json file")
@@ -107,11 +105,9 @@ public class UserController {
             @Parameter(name = "email", required = true, description = "New email for the user")
     })
     @PutMapping("")
-    public ResponseEntity<User> updateUser(@RequestBody User userR) {
+    public ResponseEntity<User> updateUser(@RequestBody User userR) throws UserNotFoundException {
         User user = this.userService.updateUser(userR);
-        return user == null ?
-                ResponseEntity.status(HttpStatus.NOT_FOUND).build()
-                : ResponseEntity.status(HttpStatus.OK).body(user);
+        return ResponseEntity.status(HttpStatus.OK).body(user);
     }
 
     @Operation(summary = "Delete a user")
@@ -121,10 +117,8 @@ public class UserController {
     })
     @Parameter(name = "id", required = true, description = "ID of the user you want to delete")
     @DeleteMapping("{id}")
-    public ResponseEntity<User> deleteUser(@PathVariable Long id) {
+    public ResponseEntity<User> deleteUser(@PathVariable Long id) throws UserNotFoundException {
         User user = this.userService.deleteUser(id);
-        return user == null ?
-                ResponseEntity.status(HttpStatus.NOT_FOUND).build()
-                : ResponseEntity.status(HttpStatus.OK).body(user);
+        return ResponseEntity.status(HttpStatus.OK).body(user);
     }
 }

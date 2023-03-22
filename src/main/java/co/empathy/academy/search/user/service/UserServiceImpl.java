@@ -1,5 +1,7 @@
 package co.empathy.academy.search.user.service;
 
+import co.empathy.academy.search.exceptions.RepeatedUserException;
+import co.empathy.academy.search.exceptions.UserNotFoundException;
 import co.empathy.academy.search.user.model.User;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,42 +26,66 @@ public class UserServiceImpl implements UserService {
         return allUsers;
     }
 
-    public User getUserById(Long id) {
-        return users.get(id);
+    public User getUserById(Long id) throws UserNotFoundException {
+        User user = users.get(id);
+        if (user == null) {
+            throw new UserNotFoundException();
+        }
+        return user;
     }
 
-    public User addUser(User user) {
+    public User addUser(User user) throws RepeatedUserException {
         if (!this.users.containsKey(user.getId())) {
             this.users.put(user.getId(), user);
             return user;
+        } else {
+            throw new RepeatedUserException();
         }
-        return null;
     }
 
-    public User deleteUser(Long id) {
-        return this.users.remove(id);
+    public User deleteUser(Long id) throws UserNotFoundException {
+        User user = this.users.remove(id);
+        if (user == null) {
+            throw new UserNotFoundException();
+        } else {
+            return user;
+        }
+
     }
 
-    public User updateUser(User user) {
+    public User updateUser(User user) throws UserNotFoundException {
         if (this.users.containsKey(user.getId())) {
             this.users.replace(user.getId(), user);
             return user;
+        } else {
+            throw new UserNotFoundException();
         }
-        return null;
     }
 
-    public List<User> saveUsers(MultipartFile file) throws IOException {
+    public List<User> saveUsers(MultipartFile file) throws IOException, RepeatedUserException {
         List<User> users = new ObjectMapper().readValue(file.getBytes(), new TypeReference<>() {
         });
-        users.forEach(this::addUser);
+        for (User user : users) {
+            if (!this.users.containsKey(user.getId())) {
+                this.users.put(user.getId(), user);
+            } else {
+                throw new RepeatedUserException();
+            }
+        }
         return users;
     }
-    
+
     @Async
-    public CompletableFuture<List<User>> saveUsersAsync(MultipartFile file) throws IOException {
+    public CompletableFuture<List<User>> saveUsersAsync(MultipartFile file) throws IOException, RepeatedUserException {
         List<User> users = new ObjectMapper().readValue(file.getBytes(), new TypeReference<>() {
         });
-        users.forEach(this::addUser);
+        for (User user : users) {
+            if (!this.users.containsKey(user.getId())) {
+                this.users.put(user.getId(), user);
+            } else {
+                throw new RepeatedUserException();
+            }
+        }
         return CompletableFuture.completedFuture(users);
     }
 }
