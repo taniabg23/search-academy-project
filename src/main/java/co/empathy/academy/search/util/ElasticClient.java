@@ -1,4 +1,4 @@
-package co.empathy.academy.search;
+package co.empathy.academy.search.util;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;

@@ -1,6 +1,6 @@
 package co.empathy.academy.search.services;
 
-import co.empathy.academy.search.ElasticClient;
+import co.empathy.academy.search.util.ElasticClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
