@@ -1,4 +1,4 @@
-package co.empathy.academy.search.util;
+package co.empathy.academy.search.repositories;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
@@ -37,4 +37,5 @@ public class ElasticClient {
             throw new RuntimeException(e);
         }
     }
+
 }
