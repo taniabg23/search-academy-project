@@ -1,24 +1,31 @@
 package co.empathy.academy.search.model;
 
 import lombok.AllArgsConstructor;
-import lombok.Value;
+import lombok.Getter;
 
-import javax.annotation.Nullable;
 import java.util.List;
 
-@Value
 @AllArgsConstructor
+@Getter
 public class Basic {
-    private String tconst;
-    private String titleType;
-    private String primaryTitle;
-    private String originalTitle;
-    private boolean isAdult;
-    @Nullable
-    private int startYear;
-    @Nullable
-    private int endYear;
-    @Nullable
-    private int runTimeMinutos;
-    private List<String> genres;
+    String tconst;
+    String titleType;
+    String primaryTitle;
+    String originalTitle;
+    boolean isAdult;
+    int startYear;
+    int endYear;
+    int runTimeMinutos;
+    List<String> genres;
+    List<Aka> akas;
+    List<Principal> principals;
+    List<String> directors;
+    List<String> writers;
+    List<Episode> episodes;
+    double averageRating;
+    int numVotes;
+
+    public String getTconst() {
+        return this.tconst;
+    }
 }
