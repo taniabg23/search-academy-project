@@ -1,14 +1,17 @@
 package co.empathy.academy.search.repositories;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch.core.BulkRequest;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import co.elastic.clients.transport.ElasticsearchTransport;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
+import co.empathy.academy.search.model.Basic;
 import org.apache.http.HttpHost;
 import org.elasticsearch.client.RestClient;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.List;
 
 @Component
 public class ElasticClient {
@@ -38,4 +41,23 @@ public class ElasticClient {
         }
     }
 
+    public void createIndex() throws IOException {
+        createConnection();
+        client.indices().delete(i -> i.index("imdb"));
+        client.indices().create(i -> i.index("imdb"));
+    }
+
+    public void bulkMovies(List<Basic> movies) {
+        BulkRequest.Builder bulkRequest = new BulkRequest.Builder();
+
+        for (Basic b : movies) {
+            bulkRequest.operations(o -> o.index(i -> i.index("imdb").id(b.getTconst()).document(b)));
+        }
+
+        try {
+            client.bulk(bulkRequest.build());
+        } catch (IOException e) {
+            throw new RuntimeException("Ay mecachis");
+        }
+    }
 }

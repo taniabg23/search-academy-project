@@ -4,6 +4,8 @@ import co.empathy.academy.search.model.Aka;
 import co.empathy.academy.search.model.Basic;
 import co.empathy.academy.search.model.Episode;
 import co.empathy.academy.search.model.Principal;
+import co.empathy.academy.search.repositories.ElasticClient;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -16,6 +18,8 @@ import java.util.List;
 @Service
 public class MoviesService {
 
+    @Autowired
+    private ElasticClient client;
     private BufferedReader basicsBF;
     private BufferedReader akasBF;
     private BufferedReader principalsBF;
@@ -53,6 +57,8 @@ public class MoviesService {
             movies.add(basic);
             moviesReaden++;
         }
+        client.createIndex();
+        client.bulkMovies(movies);
         return movies;
     }
 
