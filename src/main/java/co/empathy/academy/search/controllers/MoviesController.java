@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.LinkedList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/imdb")
@@ -31,9 +31,11 @@ public class MoviesController {
             @ApiResponse(responseCode = "500", description = "A problem with the file has occurred")
     })
     @Parameter(name = "file", required = true, description = "File with the movies' data")
-    @PostMapping("/data")
-    public ResponseEntity<LinkedList<Basic>> leerTsv(@RequestParam MultipartFile file) throws IOException {
-        LinkedList<Basic> dataBasic = moviesService.reedBasicsTsv(file);
+    @PostMapping("")
+    public ResponseEntity<List<Basic>> leerTsv(@RequestParam MultipartFile basics, @RequestParam MultipartFile akas,
+                                               @RequestParam MultipartFile principals, @RequestParam MultipartFile ratings,
+                                               @RequestParam MultipartFile crew, @RequestParam MultipartFile episodes) throws IOException {
+        List<Basic> dataBasic = moviesService.readData(basics, akas, principals, ratings, crew, episodes);
         return ResponseEntity.status(HttpStatus.OK).body(dataBasic);
     }
 }
