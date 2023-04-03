@@ -2,10 +2,11 @@ package co.empathy.academy.search.repositories;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.core.BulkRequest;
+import co.elastic.clients.elasticsearch.indices.ExistsRequest;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import co.elastic.clients.transport.ElasticsearchTransport;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
-import co.empathy.academy.search.model.Basic;
+import co.empathy.academy.search.model.Movie;
 import org.apache.http.HttpHost;
 import org.elasticsearch.client.RestClient;
 import org.springframework.stereotype.Component;
@@ -43,14 +44,17 @@ public class ElasticClient {
 
     public void createIndex() throws IOException {
         createConnection();
-        client.indices().delete(i -> i.index("imdb"));
+        boolean exists = client.indices().exists(ExistsRequest.of(e -> e.index("imdb"))).value();
+        if (exists) {
+            client.indices().delete(i -> i.index("imdb"));
+        }
         client.indices().create(i -> i.index("imdb"));
     }
 
-    public void bulkMovies(List<Basic> movies) {
+    public void bulkMovies(List<Movie> movies) {
         BulkRequest.Builder bulkRequest = new BulkRequest.Builder();
 
-        for (Basic b : movies) {
+        for (Movie b : movies) {
             bulkRequest.operations(o -> o.index(i -> i.index("imdb").id(b.getTconst()).document(b)));
         }
 

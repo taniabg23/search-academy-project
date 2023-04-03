@@ -1,8 +1,8 @@
 package co.empathy.academy.search.services;
 
 import co.empathy.academy.search.model.Aka;
-import co.empathy.academy.search.model.Basic;
 import co.empathy.academy.search.model.Episode;
+import co.empathy.academy.search.model.Movie;
 import co.empathy.academy.search.model.Principal;
 import co.empathy.academy.search.repositories.ElasticClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,46 +27,55 @@ public class MoviesService {
     private BufferedReader crewBF;
     private BufferedReader episodesBF;
     private boolean endMovies = false;
-    private static final int MAX_NUM_MOVIES = 200;
-    private List<Basic> movies = new LinkedList<>();
+    private static final int MAX_NUM_MOVIES = 30000;
+    private List<Movie> movies = new LinkedList<>();
 
-    public List<Basic> readData(MultipartFile basics, MultipartFile akas,
-                                MultipartFile principals, MultipartFile ratings,
-                                MultipartFile crew, MultipartFile episodes) throws IOException {
+    public int readData(MultipartFile basics, MultipartFile akas,
+                        MultipartFile principals, MultipartFile ratings,
+                        MultipartFile crew, MultipartFile episodes) throws IOException {
 
         inicializeBuffereds(basics, akas, principals, ratings, crew, episodes);
 
         int moviesReaden = 0;
+        int totalMoviesIndexed = 0;
         String tconst;
-        Basic basic;
+        Movie basic;
 
-        while (moviesReaden < MAX_NUM_MOVIES) {
-            //leer los basics
-            String lineBasic = this.basicsBF.readLine();
-            if (lineBasic == null) {
-                this.endMovies = true;
-                break;
-            }
-            String[] valuesBasic = lineBasic.split("\t");
-            if (Integer.parseInt(valuesBasic[4]) == 1) {
-                continue;
-            }
-            tconst = valuesBasic[0];
-
-            basic = getBasic(tconst, valuesBasic);
-            movies.add(basic);
-            moviesReaden++;
-        }
         client.createIndex();
-        client.bulkMovies(movies);
-        return movies;
+
+        // mientras queden películas
+        while (!this.endMovies) {
+            //leemos de 30.000 en 30.000
+            while (moviesReaden < MAX_NUM_MOVIES) {
+                //leer los basics
+                String lineBasic = this.basicsBF.readLine();
+                if (lineBasic == null) {
+                    this.endMovies = true;
+                    break;
+                }
+                String[] valuesBasic = lineBasic.split("\t");
+                if (Integer.parseInt(valuesBasic[4]) == 1) {
+                    continue;
+                }
+                tconst = valuesBasic[0];
+
+                basic = getBasic(tconst, valuesBasic);
+                movies.add(basic);
+                moviesReaden++;
+                totalMoviesIndexed++;
+            }
+            client.bulkMovies(movies);
+            movies.clear();
+            moviesReaden = 0;
+        }
+        return totalMoviesIndexed;
     }
 
-    private Basic getBasic(String tconst, String[] valuesBasic) throws IOException {
+    private Movie getBasic(String tconst, String[] valuesBasic) throws IOException {
         String titleType, primaryTitle, originalTitle;
         int startYear, endYear, runTimeMinutos;
         List<String> genres;
-        Basic basic;
+        Movie basic;
         //leer el resto
         //leer akas
         List<Aka> akasBasic = readAkas(tconst);
@@ -110,7 +119,7 @@ public class MoviesService {
         endYear = !(valuesBasic[6].equals("\\N")) ? Integer.parseInt(valuesBasic[6]) : -1;
         runTimeMinutos = !(valuesBasic[7].equals("\\N")) ? Integer.parseInt(valuesBasic[7]) : -1;
         genres = List.of(valuesBasic[8].split(","));
-        basic = new Basic(tconst, titleType, primaryTitle, originalTitle, false, startYear, endYear, runTimeMinutos, genres, akasBasic, principalsBasic, directorsConst, writersConst, episodesBasic, averageRating, numVotes);
+        basic = new Movie(tconst, titleType, primaryTitle, originalTitle, false, startYear, endYear, runTimeMinutos, genres, akasBasic, principalsBasic, directorsConst, writersConst, episodesBasic, averageRating, numVotes);
         return basic;
     }
 

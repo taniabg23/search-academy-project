@@ -7,7 +7,7 @@ import java.util.List;
 
 @AllArgsConstructor
 @Getter
-public class Basic {
+public class Movie {
     String tconst;
     String titleType;
     String primaryTitle;
