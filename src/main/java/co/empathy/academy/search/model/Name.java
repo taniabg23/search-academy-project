@@ -5,8 +5,6 @@ import lombok.Value;
 
 @Value
 @AllArgsConstructor
-public class Episode {
-    private String tconst;
-    private int seasonNumber;
-    private int episodeNumber;
+public class Name {
+    private String nconst;
 }

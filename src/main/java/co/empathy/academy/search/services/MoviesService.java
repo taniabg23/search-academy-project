@@ -1,9 +1,6 @@
 package co.empathy.academy.search.services;
 
-import co.empathy.academy.search.model.Aka;
-import co.empathy.academy.search.model.Episode;
-import co.empathy.academy.search.model.Movie;
-import co.empathy.academy.search.model.Principal;
+import co.empathy.academy.search.model.*;
 import co.empathy.academy.search.repositories.ElasticClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -98,28 +95,25 @@ public class MoviesService {
 
         //leer crew
         String lineCrew = this.crewBF.readLine();
-        List<String> directorsConst, writersConst;
+        List<String> directorsConst;
+        List<Director> directors = new LinkedList<>();
         if (lineCrew != null) {
             String[] valuesCrew = lineCrew.split("\t");
             directorsConst = valuesCrew[1].equals("\\N") ? new LinkedList<>() : List.of(valuesCrew[1].split(","));
-            writersConst = valuesCrew[2].equals("\\N") ? new LinkedList<>() : List.of(valuesCrew[2].split(","));
-        } else {
-            directorsConst = new LinkedList<>();
-            writersConst = new LinkedList<>();
+            for (String nconst : directorsConst) {
+                directors.add(new Director(nconst));
+            }
         }
-
-        //leer episodes
-        List<Episode> episodesBasic = readEpisodes(tconst);
 
         //crear movie
         titleType = valuesBasic[1];
         primaryTitle = valuesBasic[2];
         originalTitle = valuesBasic[3];
-        startYear = !(valuesBasic[5].equals("\\N")) ? Integer.parseInt(valuesBasic[5]) : -1;
-        endYear = !(valuesBasic[6].equals("\\N")) ? Integer.parseInt(valuesBasic[6]) : -1;
-        runTimeMinutos = !(valuesBasic[7].equals("\\N")) ? Integer.parseInt(valuesBasic[7]) : -1;
+        startYear = !(valuesBasic[5].equals("\\N")) ? Integer.parseInt(valuesBasic[5]) : 0;
+        endYear = !(valuesBasic[6].equals("\\N")) ? Integer.parseInt(valuesBasic[6]) : 0;
+        runTimeMinutos = !(valuesBasic[7].equals("\\N")) ? Integer.parseInt(valuesBasic[7]) : 0;
         genres = List.of(valuesBasic[8].split(","));
-        basic = new Movie(tconst, titleType, primaryTitle, originalTitle, false, startYear, endYear, runTimeMinutos, genres, akasBasic, principalsBasic, directorsConst, writersConst, episodesBasic, averageRating, numVotes);
+        basic = new Movie(tconst, titleType, primaryTitle, originalTitle, false, startYear, endYear, runTimeMinutos, genres, averageRating, numVotes, akasBasic, directors, principalsBasic);
         return basic;
     }
 
@@ -141,36 +135,6 @@ public class MoviesService {
         this.episodesBF.readLine();
     }
 
-    private List<Episode> readEpisodes(String tconst) throws IOException {
-        List<Episode> episodes = new LinkedList<>();
-        this.episodesBF.mark(3000);
-        String lineEpisode = this.episodesBF.readLine();
-
-        String[] valuesEpisode;
-        String episodeConst;
-        int seasonNumber, episodeNumber;
-        Episode episode;
-
-        while (lineEpisode != null) {
-            valuesEpisode = lineEpisode.split("\t");
-            if (valuesEpisode[1].equals(tconst)) {
-                //creo el aka
-                episodeConst = valuesEpisode[1];
-                seasonNumber = !(valuesEpisode[2].equals("\\N")) ? Integer.parseInt(valuesEpisode[2]) : -1;
-                episodeNumber = !(valuesEpisode[3].equals("\\N")) ? Integer.parseInt(valuesEpisode[3]) : -1;
-                episode = new Episode(episodeConst, seasonNumber, episodeNumber);
-                episodes.add(episode);
-                //marco y leo otra línea
-                this.episodesBF.mark(3000);
-                lineEpisode = this.episodesBF.readLine();
-            } else {
-                this.episodesBF.reset();
-                break;
-            }
-        }
-        return episodes;
-    }
-
     private List<Aka> readAkas(String tconst) throws IOException {
         List<Aka> akas = new LinkedList<>();
         this.akasBF.mark(3000);
@@ -178,7 +142,6 @@ public class MoviesService {
 
         String[] valuesAka;
         String title, region, language;
-        List<String> types, attributes;
         boolean isOriginalTitle;
         Aka aka;
 
@@ -187,12 +150,10 @@ public class MoviesService {
             if (valuesAka[0].equals(tconst)) {
                 //creo el aka
                 title = valuesAka[2];
-                region = !(valuesAka[3].equals("\\N")) ? valuesAka[3] : null;
-                language = !(valuesAka[4].equals("\\N")) ? valuesAka[4] : null;
-                types = !(valuesAka[5].equals("\\N")) ? List.of(valuesAka[5].split(",")) : null;
-                attributes = !(valuesAka[6].equals("\\N")) ? List.of(valuesAka[6].split(",")) : null;
+                region = valuesAka[3];
+                language = valuesAka[4];
                 isOriginalTitle = Integer.parseInt(valuesAka[7]) == 1 ? true : false;
-                aka = new Aka(title, region, language, types, attributes, isOriginalTitle);
+                aka = new Aka(title, region, language, isOriginalTitle);
                 akas.add(aka);
                 //marco y leo otra línea
                 this.akasBF.mark(3000);
@@ -211,7 +172,7 @@ public class MoviesService {
         String linePrincipal = this.principalsBF.readLine();
 
         String[] valuesPrincipal;
-        String nconst, category, job, characters;
+        String nconst, characters;
         Principal principal;
 
         while (linePrincipal != null) {
@@ -219,10 +180,8 @@ public class MoviesService {
             if (valuesPrincipal[0].equals(tconst)) {
                 //creo el aka
                 nconst = valuesPrincipal[1];
-                category = valuesPrincipal[2];
-                job = valuesPrincipal[3];
                 characters = valuesPrincipal[4];
-                principal = new Principal(nconst, category, job, characters);
+                principal = new Principal(new Name(nconst), characters);
                 principals.add(principal);
                 //marco y leo otra línea
                 this.principalsBF.mark(3000);

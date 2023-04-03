@@ -15,17 +15,15 @@ public class Movie {
     boolean isAdult;
     int startYear;
     int endYear;
-    int runTimeMinutos;
+    int runtimeMinutes;
     List<String> genres;
-    List<Aka> akas;
-    List<Principal> principals;
-    List<String> directors;
-    List<String> writers;
-    List<Episode> episodes;
     double averageRating;
     int numVotes;
+    List<Aka> akas;
+    List<Director> directors;
+    List<Principal> starring;
 
-    public String getTconst() {
-        return this.tconst;
-    }
+    //List<String> writers;
+    //List<Episode> episodes;
+
 }
