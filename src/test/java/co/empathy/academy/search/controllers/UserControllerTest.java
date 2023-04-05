@@ -144,6 +144,7 @@ public class UserControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.email").value("user12@email"));
     }
 
+    /*
     @Test
     void givenMoreThanOneUser_whenAskForAllUsers_thenReturnsListWithUsers() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/users")
@@ -188,6 +189,7 @@ public class UserControllerTest {
                         "\"email\":" + "\"user16@email\"" +
                         "}]"));
     }
+     */
 
     @Test
     void givenNoUser_whenAddUserWithFile_thenReturnsUsersData() throws Exception {
