@@ -9,15 +9,18 @@ import co.elastic.clients.transport.rest_client.RestClientTransport;
 import co.empathy.academy.search.model.Movie;
 import org.apache.http.HttpHost;
 import org.elasticsearch.client.RestClient;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 @Component
 public class ElasticClient {
 
     private ElasticsearchClient client;
+    private static final String INDEX = "imdb";
 
     private void createConnection() {
         // Create the low-level client
@@ -44,18 +47,29 @@ public class ElasticClient {
 
     public void createIndex() throws IOException {
         createConnection();
-        boolean exists = client.indices().exists(ExistsRequest.of(e -> e.index("imdb"))).value();
+        boolean exists = client.indices().exists(ExistsRequest.of(e -> e.index(INDEX))).value();
         if (exists) {
-            client.indices().delete(i -> i.index("imdb"));
+            client.indices().delete(i -> i.index(INDEX));
         }
-        client.indices().create(i -> i.index("imdb"));
+        client.indices().create(i -> i.index(INDEX));
+        setMapping();
+    }
+
+    public void setMapping() {
+        try {
+            InputStream jsonMapping = new ClassPathResource("mapping.json").getInputStream();
+            client.indices().putMapping(p -> p.index(INDEX).withJson(jsonMapping));
+        } catch (IOException e) {
+            throw new RuntimeException("Error en la lectura del mapping");
+        }
+
     }
 
     public void bulkMovies(List<Movie> movies) {
         BulkRequest.Builder bulkRequest = new BulkRequest.Builder();
 
         for (Movie b : movies) {
-            bulkRequest.operations(o -> o.index(i -> i.index("imdb").id(b.getTconst()).document(b)));
+            bulkRequest.operations(o -> o.index(i -> i.index(INDEX).id(b.getTconst()).document(b)));
         }
 
         try {

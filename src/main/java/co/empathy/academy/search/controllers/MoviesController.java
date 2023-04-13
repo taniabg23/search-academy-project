@@ -1,6 +1,6 @@
 package co.empathy.academy.search.controllers;
 
-import co.empathy.academy.search.services.MoviesService;
+import co.empathy.academy.search.services.MoviesService2;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -21,7 +21,7 @@ import java.io.IOException;
 public class MoviesController {
 
     @Autowired
-    private MoviesService moviesService;
+    private MoviesService2 moviesService;
 
     @Operation(summary = "Create new users with the data stored in a json file")
     @ApiResponses(value = {
@@ -32,8 +32,8 @@ public class MoviesController {
     @PostMapping("")
     public ResponseEntity<String> leerTsv(@RequestParam MultipartFile basics, @RequestParam MultipartFile akas,
                                           @RequestParam MultipartFile principals, @RequestParam MultipartFile ratings,
-                                          @RequestParam MultipartFile crew, @RequestParam MultipartFile episodes) throws IOException {
-        int dataBasic = moviesService.readData(basics, akas, principals, ratings, crew, episodes);
+                                          @RequestParam MultipartFile crew) throws IOException {
+        int dataBasic = moviesService.readData(basics, akas, principals, ratings, crew);
         return ResponseEntity.status(HttpStatus.OK).body("Ta to bien, de chill. ha indexado " + dataBasic + " películas");
     }
 }

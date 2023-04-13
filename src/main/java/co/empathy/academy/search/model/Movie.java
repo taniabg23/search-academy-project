@@ -2,11 +2,13 @@ package co.empathy.academy.search.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
 @AllArgsConstructor
 @Getter
+@Setter
 public class Movie {
     String tconst;
     String titleType;
@@ -22,8 +24,4 @@ public class Movie {
     List<Aka> akas;
     List<Director> directors;
     List<Principal> starring;
-
-    //List<String> writers;
-    //List<Episode> episodes;
-
 }
