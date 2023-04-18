@@ -52,10 +52,22 @@ public class ElasticClient {
             client.indices().delete(i -> i.index(INDEX));
         }
         client.indices().create(i -> i.index(INDEX));
+        setAnalyzer();
         setMapping();
     }
 
-    public void setMapping() {
+    private void setAnalyzer() {
+        try {
+            client.indices().close(c -> c.index(INDEX));
+            InputStream jsonAnalyzer = new ClassPathResource("custom_analyzer.json").getInputStream();
+            client.indices().putSettings(s -> s.index(INDEX).withJson(jsonAnalyzer));
+            client.indices().open(o -> o.index(INDEX));
+        } catch (IOException e) {
+            throw new RuntimeException("Error en la lectura del analyzer");
+        }
+    }
+
+    private void setMapping() {
         try {
             InputStream jsonMapping = new ClassPathResource("mapping.json").getInputStream();
             client.indices().putMapping(p -> p.index(INDEX).withJson(jsonMapping));
