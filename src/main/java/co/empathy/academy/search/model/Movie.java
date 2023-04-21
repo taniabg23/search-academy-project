@@ -1,5 +1,6 @@
 package co.empathy.academy.search.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,6 +15,7 @@ public class Movie {
     String titleType;
     String primaryTitle;
     String originalTitle;
+    @JsonProperty("isAdult")
     boolean isAdult;
     int startYear;
     int endYear;
