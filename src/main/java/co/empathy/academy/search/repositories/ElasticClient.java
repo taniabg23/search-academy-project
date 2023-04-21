@@ -1,7 +1,11 @@
 package co.empathy.academy.search.repositories;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.BulkRequest;
+import co.elastic.clients.elasticsearch.core.SearchRequest;
+import co.elastic.clients.elasticsearch.core.SearchResponse;
+import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.elasticsearch.indices.ExistsRequest;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import co.elastic.clients.transport.ElasticsearchTransport;
@@ -89,5 +93,23 @@ public class ElasticClient {
         } catch (IOException e) {
             throw new RuntimeException("Ay mecachis");
         }
+    }
+
+    //////////  QUERIES
+
+    public List<Object> executeQuery(Query query, int size) throws IOException {
+        createConnection();
+
+        SearchRequest searchRequest = SearchRequest.of(s -> s
+                .index(INDEX)
+                .query(query)
+                .size(size));
+        System.out.println(searchRequest.toString());
+
+        SearchResponse<Object> response = client.search(searchRequest, Object.class);
+
+        return response.hits().hits().stream()
+                .map(Hit::source)
+                .toList();
     }
 }
