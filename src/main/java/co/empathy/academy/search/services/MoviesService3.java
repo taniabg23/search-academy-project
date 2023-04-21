@@ -45,9 +45,6 @@ public class MoviesService3 {
             while (moviesReaden < MAX_NUM_MOVIES) {
                 //leer los basics
                 String lineBasic = this.basicsBF.readLine();
-                this.basicsBF.mark(3000);
-                String nextLineBasic = this.basicsBF.readLine();
-                this.basicsBF.reset();
                 if (lineBasic == null) {
                     this.endMovies = true;
                     break;
@@ -57,7 +54,8 @@ public class MoviesService3 {
                     continue;
                 }
                 tconst = valuesBasic[0];
-                basic = (nextLineBasic == null) ? getBasic(tconst, valuesBasic, null) : getBasic(tconst, valuesBasic, nextLineBasic.split("\t")[0]);
+
+                basic = getBasic(tconst, valuesBasic);
                 movies.add(basic);
                 moviesReaden++;
                 totalMoviesIndexed++;
@@ -85,69 +83,41 @@ public class MoviesService3 {
         this.crewBF.readLine();
     }
 
-    private Movie getBasic(String tconst, String[] valuesBasic, String nextTconst) throws IOException {
+    private Movie getBasic(String tconst, String[] valuesBasic) throws IOException {
         String titleType, primaryTitle, originalTitle;
         int startYear, endYear, runTimeMinutos;
         List<String> genres;
         Movie basic;
         //leer el resto
         //leer akas
-        System.out.println("Leyendo película: " + tconst + ", next: " + nextTconst);
-        System.out.println("Leyendo akas");
-        List<Aka> akasBasic = readAkas(tconst, nextTconst);
-
+        List<Aka> akasBasic = readAkas(tconst);
 
         //leer principals
-        System.out.println("Leyendo principals");
-        List<Principal> principalsBasic = readPrincipals(tconst, nextTconst);
-
+        List<Principal> principalsBasic = readPrincipals(tconst);
 
         //leer rating
         String lineRating = this.ratingsBF.readLine();
-        this.ratingsBF.mark(3000);
-        double averageRating = 0.0;
-        int numVotes = 0;
-        while (lineRating != null) {
+        double averageRating;
+        int numVotes;
+        if (lineRating != null) {
             String[] valuesRating = lineRating.split("\t");
-            if (tconst.equals(valuesRating[0])) {
-                averageRating = Double.parseDouble(valuesRating[1]);
-                numVotes = Integer.parseInt(valuesRating[2]);
-                break;
-            } else if (nextTconst.equals(valuesRating[0])) {
-                averageRating = 0.0;
-                numVotes = 0;
-                this.ratingsBF.reset();
-                break;
-            }
-            this.ratingsBF.mark(3000);
-            lineRating = this.ratingsBF.readLine();
+            averageRating = Double.parseDouble(valuesRating[1]);
+            numVotes = Integer.parseInt(valuesRating[2]);
+        } else {
+            averageRating = 0.0;
+            numVotes = 0;
         }
 
         //leer crew
         String lineCrew = this.crewBF.readLine();
-        this.crewBF.mark(3000);
         List<String> directorsConst;
         List<Director> directors = new LinkedList<>();
-
-        while (lineCrew != null) {
+        if (lineCrew != null) {
             String[] valuesCrew = lineCrew.split("\t");
-            if (tconst.equals(valuesCrew[0])) {
-                if (!valuesCrew[1].equals("\\N")) {
-                    directorsConst = List.of(valuesCrew[1].split(","));
-                    for (String nconst : directorsConst) {
-                        directors.add(new Director(nconst));
-                    }
-                } else {
-                    directors = new LinkedList<>();
-                }
-                break;
-            } else if (nextTconst.equals(valuesCrew[0])) {
-                directors = new LinkedList<>();
-                this.crewBF.reset();
-                break;
+            directorsConst = valuesCrew[1].equals("\\N") ? new LinkedList<>() : List.of(valuesCrew[1].split(","));
+            for (String nconst : directorsConst) {
+                directors.add(new Director(nconst));
             }
-            this.crewBF.mark(3000);
-            lineCrew = this.crewBF.readLine();
         }
 
         //crear movie
@@ -162,113 +132,62 @@ public class MoviesService3 {
         return basic;
     }
 
-    private List<Aka> readAkas(String tconst, String nextTconst) throws IOException {
+    private List<Aka> readAkas(String tconst) throws IOException {
         List<Aka> akas = new LinkedList<>();
         this.akasBF.mark(3000);
         String lineAka = this.akasBF.readLine();
 
         String[] valuesAka;
-        String tconstA;
+        String title, region, language;
+        boolean isOriginalTitle;
         Aka aka;
 
         while (lineAka != null) {
             valuesAka = lineAka.split("\t");
-            tconstA = valuesAka[0];
-            if (tconstA.equals(tconst)) {
-                while (tconstA.equals(tconst) && lineAka != null) {
-                    aka = getAka(valuesAka);
-                    akas.add(aka);
-                    this.akasBF.mark(3000);
-                    lineAka = this.akasBF.readLine();
-                    if (lineAka == null) break;
-                    valuesAka = lineAka.split("\t");
-                    tconstA = valuesAka[0];
-                }
-                this.akasBF.reset();
-                return akas;
+            if (valuesAka[0].equals(tconst)) {
+                //creo el aka
+                title = valuesAka[2];
+                region = valuesAka[3];
+                language = valuesAka[4];
+                isOriginalTitle = Integer.parseInt(valuesAka[7]) == 1 ? true : false;
+                aka = new Aka(title, region, language, isOriginalTitle);
+                akas.add(aka);
+                //marco y leo otra línea
+                this.akasBF.mark(3000);
+                lineAka = this.akasBF.readLine();
             } else {
-                while (lineAka != null && !tconst.equals(tconstA)) {
-                    this.akasBF.mark(3000);
-                    lineAka = this.akasBF.readLine();
-                    if (lineAka == null) {
-                        break;
-                    }
-                    valuesAka = lineAka.split("\t");
-                    tconstA = valuesAka[0];
-                    if (nextTconst != null && nextTconst.equals(tconstA)) {
-                        this.akasBF.reset();
-                        return new LinkedList<>();
-                    }
-                }
+                this.akasBF.reset();
+                break;
             }
         }
-        return new LinkedList<>();
+        return akas;
     }
 
-    private List<Principal> readPrincipals(String tconst, String nextTconst) throws IOException {
+    private List<Principal> readPrincipals(String tconst) throws IOException {
         List<Principal> principals = new LinkedList<>();
         this.principalsBF.mark(3000);
         String linePrincipal = this.principalsBF.readLine();
 
         String[] valuesPrincipal;
-        String tconstP;
+        String nconst, characters;
         Principal principal;
 
         while (linePrincipal != null) {
             valuesPrincipal = linePrincipal.split("\t");
-            tconstP = valuesPrincipal[0];
-            if (tconstP.equals(tconst)) {
-                while (tconstP.equals(tconst) && linePrincipal != null) {
-                    principal = getPrincipal(valuesPrincipal);
-                    principals.add(principal);
-                    this.principalsBF.mark(3000);
-                    linePrincipal = this.principalsBF.readLine();
-                    if (linePrincipal == null) break;
-                    valuesPrincipal = linePrincipal.split("\t");
-                    tconstP = valuesPrincipal[0];
-                }
-                this.principalsBF.reset();
-                return principals;
+            if (valuesPrincipal[0].equals(tconst)) {
+                //creo el aka
+                nconst = valuesPrincipal[1];
+                characters = valuesPrincipal[4];
+                principal = new Principal(new Name(nconst), characters);
+                principals.add(principal);
+                //marco y leo otra línea
+                this.principalsBF.mark(3000);
+                linePrincipal = this.principalsBF.readLine();
             } else {
-                while (linePrincipal != null && !tconst.equals(tconstP)) {
-                    this.principalsBF.mark(3000);
-                    linePrincipal = this.principalsBF.readLine();
-                    if (linePrincipal == null) {
-                        break;
-                    }
-                    valuesPrincipal = linePrincipal.split("\t");
-                    tconstP = valuesPrincipal[0];
-                    if (nextTconst != null && nextTconst.equals(tconstP)) {
-                        this.principalsBF.reset();
-                        return new LinkedList<>();
-                    }
-                }
+                this.principalsBF.reset();
+                break;
             }
         }
-        return new LinkedList<>();
-    }
-
-    private Principal getPrincipal(String[] valuesPrincipal) {
-        String nconst;
-        Principal principal;
-        String characters;
-        nconst = valuesPrincipal[1];
-        characters = valuesPrincipal[4];
-        principal = new Principal(new Name(nconst), characters);
-        return principal;
-    }
-
-    private Aka getAka(String[] valuesAka) {
-        String title;
-        Aka aka;
-        String region;
-        boolean isOriginalTitle;
-        String language;
-        title = valuesAka[2];
-        region = valuesAka[3];
-        language = valuesAka[4];
-        isOriginalTitle = valuesAka[7].equals("\\N") || Integer.parseInt(valuesAka[7]) == 0 ? false : true;
-        aka = new Aka(title, region, language, isOriginalTitle);
-        return aka;
+        return principals;
     }
 }

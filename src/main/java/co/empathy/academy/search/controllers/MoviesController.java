@@ -1,6 +1,6 @@
 package co.empathy.academy.search.controllers;
 
-import co.empathy.academy.search.services.MoviesService3;
+import co.empathy.academy.search.services.MoviesService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -21,7 +21,7 @@ import java.io.IOException;
 public class MoviesController {
 
     @Autowired
-    private MoviesService3 moviesService;
+    private MoviesService moviesService;
 
     @Operation(summary = "Create new users with the data stored in a json file")
     @ApiResponses(value = {
