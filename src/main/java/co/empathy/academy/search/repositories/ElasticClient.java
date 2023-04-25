@@ -21,10 +21,8 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 @Component
 public class ElasticClient {
@@ -101,8 +99,6 @@ public class ElasticClient {
         }
     }
 
-    //////////  QUERIES
-
     public List<Object> executeQuery(Query query, int size) throws IOException {
         createConnection();
 
@@ -129,14 +125,10 @@ public class ElasticClient {
         SearchResponse<Object> response = client.search(searchRequest, Object.class);
 
         List<StringTermsBucket> buckets = response.aggregations().get("genres").sterms().buckets().array();
-        System.out.println(buckets);
-        Map<String, List<Bucket>> bucketMap = new HashMap<>();
         List<Bucket> bucketList = new LinkedList<>();
 
         for (StringTermsBucket bucket : buckets) {
-            System.out.println("Key: " + bucket.key().stringValue() + ", doc_count: " + bucket.docCount());
-            Bucket b = new Bucket(bucket.key().stringValue(), bucket.docCount());
-            bucketList.add(b);
+            bucketList.add(new Bucket(bucket.key().stringValue(), bucket.docCount()));
         }
 
         return bucketList;
