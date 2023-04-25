@@ -119,7 +119,7 @@ public class ElasticClient {
                 .toList();
     }
 
-    public List<StringTermsBucket> executeAggs(Aggregation aggs) throws IOException {
+    public List<Bucket> executeAggs(Aggregation aggs) throws IOException {
         createConnection();
 
         SearchRequest searchRequest = SearchRequest.of(s -> s.
@@ -139,6 +139,6 @@ public class ElasticClient {
             bucketList.add(b);
         }
 
-        return buckets;
+        return bucketList;
     }
 }

@@ -1,7 +1,7 @@
 package co.empathy.academy.search.controllers;
 
-import co.elastic.clients.elasticsearch._types.aggregations.StringTermsBucket;
 import co.empathy.academy.search.services.SearchService;
+import co.empathy.academy.search.util.Bucket;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -47,7 +47,7 @@ public class QueriesIMDbController {
     }
 
     @GetMapping("/genres")
-    public ResponseEntity<List<StringTermsBucket>> getGenres() {
+    public ResponseEntity<List<Bucket>> getGenres() {
         try {
             return ResponseEntity.status(HttpStatus.OK).body(searchService.getGenres());
         } catch (IOException e) {

@@ -1,7 +1,7 @@
 package co.empathy.academy.search.services;
 
-import co.elastic.clients.elasticsearch._types.aggregations.StringTermsBucket;
 import co.empathy.academy.search.repositories.ElasticClient;
+import co.empathy.academy.search.util.Bucket;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -36,7 +36,7 @@ public class SearchServiceImpl implements SearchService {
     }
 
     @Override
-    public List<StringTermsBucket> getGenres() throws IOException {
+    public List<Bucket> getGenres() throws IOException {
         return elastic.executeAggs(queryService.getGenres());
     }
 
