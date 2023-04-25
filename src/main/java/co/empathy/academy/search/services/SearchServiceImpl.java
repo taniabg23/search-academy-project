@@ -1,5 +1,6 @@
 package co.empathy.academy.search.services;
 
+import co.elastic.clients.elasticsearch._types.aggregations.StringTermsBucket;
 import co.empathy.academy.search.repositories.ElasticClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,8 +31,13 @@ public class SearchServiceImpl implements SearchService {
     }
 
     @Override
-    public List<Object> getListMoviesSearchAllFilters(Optional<Integer> yearMin, Optional<Integer> yearMax, Optional<Double> ratingMin, Optional<Double> ratingMax, Optional<Integer> minutesMin, Optional<Integer> minutesMax, Optional<String> type, Optional<String> genres, Optional<String> sortRating) {
-        return elastic.executeQuery(queryService.allFiltersQuery(yearMin, yearMax, ratingMin, ratingMax, minutesMin, minutesMax, type, genres, sortRating), 100);
+    public List<Object> getListMoviesSearchAllFilters(Optional<Integer> yearMin, Optional<Integer> yearMax, Optional<Double> ratingMin, Optional<Double> ratingMax, Optional<Integer> minutesMin, Optional<Integer> minutesMax, Optional<String> type, Optional<String> genres, Optional<String> values) throws IOException {
+        return elastic.executeQuery(queryService.allFiltersQuery(yearMin, yearMax, ratingMin, ratingMax, minutesMin, minutesMax, type, genres, values), 100);
+    }
+
+    @Override
+    public List<StringTermsBucket> getGenres() throws IOException {
+        return elastic.executeAggs(queryService.getGenres());
     }
 
 }

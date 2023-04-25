@@ -1,6 +1,8 @@
 package co.empathy.academy.search.repositories;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.aggregations.Aggregation;
+import co.elastic.clients.elasticsearch._types.aggregations.StringTermsBucket;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.BulkRequest;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
@@ -11,6 +13,7 @@ import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import co.elastic.clients.transport.ElasticsearchTransport;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
 import co.empathy.academy.search.model.Movie;
+import co.empathy.academy.search.util.Bucket;
 import org.apache.http.HttpHost;
 import org.elasticsearch.client.RestClient;
 import org.springframework.core.io.ClassPathResource;
@@ -18,7 +21,10 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class ElasticClient {
@@ -67,7 +73,7 @@ public class ElasticClient {
             client.indices().putSettings(s -> s.index(INDEX).withJson(jsonAnalyzer));
             client.indices().open(o -> o.index(INDEX));
         } catch (IOException e) {
-            throw new RuntimeException("Error en la lectura del analyzer");
+            throw new RuntimeException("Error reading the analyzer file");
         }
     }
 
@@ -76,7 +82,7 @@ public class ElasticClient {
             InputStream jsonMapping = new ClassPathResource("mapping.json").getInputStream();
             client.indices().putMapping(p -> p.index(INDEX).withJson(jsonMapping));
         } catch (IOException e) {
-            throw new RuntimeException("Error en la lectura del mapping");
+            throw new RuntimeException("Error reading the mapping file");
         }
 
     }
@@ -91,7 +97,7 @@ public class ElasticClient {
         try {
             client.bulk(bulkRequest.build());
         } catch (IOException e) {
-            throw new RuntimeException("Ay mecachis");
+            throw new RuntimeException("Error in bulk");
         }
     }
 
@@ -111,5 +117,28 @@ public class ElasticClient {
         return response.hits().hits().stream()
                 .map(Hit::source)
                 .toList();
+    }
+
+    public List<StringTermsBucket> executeAggs(Aggregation aggs) throws IOException {
+        createConnection();
+
+        SearchRequest searchRequest = SearchRequest.of(s -> s.
+                index(INDEX).
+                aggregations("genres", aggs));
+
+        SearchResponse<Object> response = client.search(searchRequest, Object.class);
+
+        List<StringTermsBucket> buckets = response.aggregations().get("genres").sterms().buckets().array();
+        System.out.println(buckets);
+        Map<String, List<Bucket>> bucketMap = new HashMap<>();
+        List<Bucket> bucketList = new LinkedList<>();
+
+        for (StringTermsBucket bucket : buckets) {
+            System.out.println("Key: " + bucket.key().stringValue() + ", doc_count: " + bucket.docCount());
+            Bucket b = new Bucket(bucket.key().stringValue(), bucket.docCount());
+            bucketList.add(b);
+        }
+
+        return buckets;
     }
 }

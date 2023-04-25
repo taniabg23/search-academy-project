@@ -1,5 +1,6 @@
 package co.empathy.academy.search.controllers;
 
+import co.elastic.clients.elasticsearch._types.aggregations.StringTermsBucket;
 import co.empathy.academy.search.services.SearchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,16 +21,16 @@ public class QueriesIMDbController {
     @Autowired
     private SearchService searchService;
 
-    @GetMapping("")
+    @GetMapping("/filters")
     public ResponseEntity<List<Object>> searchByFilters(
             @RequestParam Optional<Integer> yearMin, @RequestParam Optional<Integer> yearMax,
             @RequestParam Optional<Double> ratingMin, @RequestParam Optional<Double> ratingMax,
             @RequestParam Optional<Integer> minutesMin, @RequestParam Optional<Integer> minutesMax,
             @RequestParam Optional<String> type, @RequestParam Optional<String> genres,
-            @RequestParam Optional<String> sortRating) {
+            @RequestParam Optional<String> values) {
         try {
             System.out.println(1);
-            return ResponseEntity.status(HttpStatus.OK).body(searchService.getListMoviesSearchAllFilters(yearMin, yearMax, ratingMin, ratingMax, minutesMin, minutesMax, type, genres, sortRating));
+            return ResponseEntity.status(HttpStatus.OK).body(searchService.getListMoviesSearchAllFilters(yearMin, yearMax, ratingMin, ratingMax, minutesMin, minutesMax, type, genres, values));
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
@@ -39,8 +40,16 @@ public class QueriesIMDbController {
     public ResponseEntity<List<Object>> searchByTerms(
             @RequestParam String field, @RequestParam String values) {
         try {
-            System.out.println(1);
             return ResponseEntity.status(HttpStatus.OK).body(searchService.getListMoviesTerms(field, values));
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/genres")
+    public ResponseEntity<List<StringTermsBucket>> getGenres() {
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(searchService.getGenres());
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }

@@ -1,5 +1,7 @@
 package co.empathy.academy.search.services;
 
+import co.elastic.clients.elasticsearch._types.aggregations.Aggregation;
+import co.elastic.clients.elasticsearch._types.aggregations.TermsAggregation;
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch._types.query_dsl.RangeQuery;
@@ -23,27 +25,36 @@ public class QueryServiceImpl {
                     _toQuery());
         }
 
-        System.out.println(3);
         Query boolQuery = BoolQuery.of(b -> b.should(queries))._toQuery();
-        System.out.println(boolQuery.toString());
         return boolQuery;
     }
 
-    public Query queryRange(String field, String value, int low, int high) {
+    private Query queryRange(String field, int low, int high) {
         Query queryRange = RangeQuery.of(r -> r.
                         field(field).
                         gte(JsonData.of(low)).
-                        gte(JsonData.of(high))).
+                        lte(JsonData.of(high))).
                 _toQuery();
         return queryRange;
     }
 
-    public Query allFiltersQuery(Optional<Integer> yearMin, Optional<Integer> yearMax, Optional<Double> ratingMin, Optional<Double> ratingMax, Optional<Integer> minutesMin, Optional<Integer> minutesMax, Optional<String> type, Optional<String> genres, Optional<String> sortRating) {
+    public Query allFiltersQuery(Optional<Integer> yearMin, Optional<Integer> yearMax, Optional<Double> ratingMin, Optional<Double> ratingMax, Optional<Integer> minutesMin, Optional<Integer> minutesMax, Optional<String> type, Optional<String> genres, Optional<String> values) {
         List<Query> queries = new LinkedList<>();
 
         int yearMinValue, yearMaxValue, minutesMinValue, minutesMaxValue;
         double ratingMinValue, ratingMaxValue;
-        String typeValue, genresValue, sortRatingValue;
+
+        if (values.isPresent()) {
+            queries.add(queryTermsBoolShould("primaryTitle", values.get()));
+        }
+
+        if (type.isPresent()) {
+            queries.add(queryTermsBoolShould("titleType", type.get()));
+        }
+
+        if (genres.isPresent()) {
+            queries.add(queryTermsBoolShould("genres", genres.get()));
+        }
 
         if (yearMin.isPresent() || yearMax.isPresent()) {
             yearMinValue = (yearMin.isPresent())
@@ -52,11 +63,7 @@ public class QueryServiceImpl {
             yearMaxValue = (yearMax.isPresent())
                     ? yearMax.get()
                     : Integer.MAX_VALUE;
-            queries.add(RangeQuery.of(r -> r.
-                            field("startYear").
-                            gte(JsonData.of(yearMinValue)).
-                            gte(JsonData.of(yearMaxValue))).
-                    _toQuery());
+            queries.add(queryRange("startYear", yearMinValue, yearMaxValue));
         }
 
         if (minutesMin.isPresent() || minutesMax.isPresent()) {
@@ -66,11 +73,7 @@ public class QueryServiceImpl {
             minutesMaxValue = (minutesMax.isPresent())
                     ? minutesMax.get()
                     : Integer.MAX_VALUE;
-            queries.add(RangeQuery.of(r -> r.
-                            field("runtimeMinutes").
-                            gte(JsonData.of(minutesMinValue)).
-                            gte(JsonData.of(minutesMaxValue))).
-                    _toQuery());
+            queries.add(queryRange("runtimeMinutes", minutesMinValue, minutesMaxValue));
         }
 
         if (ratingMin.isPresent() || ratingMax.isPresent()) {
@@ -83,12 +86,17 @@ public class QueryServiceImpl {
             queries.add(RangeQuery.of(r -> r.
                             field("averageRating").
                             gte(JsonData.of(ratingMinValue)).
-                            gte(JsonData.of(ratingMaxValue))).
+                            lte(JsonData.of(ratingMaxValue))).
                     _toQuery());
         }
 
 
         Query mustQuery = BoolQuery.of(b -> b.must(queries))._toQuery();
         return mustQuery;
+    }
+
+    public Aggregation getGenres() {
+        Aggregation aggs = Aggregation.of(a -> a.terms(TermsAggregation.of(t -> t.field("genres"))));
+        return aggs;
     }
 }
