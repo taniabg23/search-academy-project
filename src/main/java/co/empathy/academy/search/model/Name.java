@@ -6,5 +6,5 @@ import lombok.Value;
 @Value
 @AllArgsConstructor
 public class Name {
-    private String nconst;
+    String nconst;
 }

@@ -6,5 +6,5 @@ import lombok.Value;
 @Value
 @AllArgsConstructor
 public class Director {
-    private String nconst;
+    String nconst;
 }

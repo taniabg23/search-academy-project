@@ -8,6 +8,6 @@ import lombok.Value;
 @AllArgsConstructor
 @Getter
 public class Principal {
-    private Name name;
-    private String characters;
+    Name name;
+    String characters;
 }

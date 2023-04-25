@@ -11,11 +11,11 @@ import javax.annotation.Nullable;
 @AllArgsConstructor
 @Getter
 public class Aka {
-    private String title;
+    String title;
     @Nullable
-    private String region;
+    String region;
     @Nullable
-    private String language;
+    String language;
     @JsonProperty("isOriginalTitle")
-    private boolean isOriginalTitle;
+    boolean isOriginalTitle;
 }
