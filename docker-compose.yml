@@ -1,0 +1,27 @@
+version: '2.1'
+services:
+  elasticsearch:
+    image: "taniabg/imdb:indexed_movies"
+    hostname: "elasticsearch"
+    container_name: elasticsearch-docker
+    environment:
+      - "discovery.type=single-node"
+      - "http.cors.enabled=true"
+      - "http.cors.allow-origin=https://app.elasticvue.com"
+    ports:
+      - "9200:9200"
+    healthcheck:
+      test: [ "CMD", "curl", "-u", "elastic:searchPathRules", "-f", "localhost:9200" ]
+      interval: 30s
+      retries: 10
+
+  searchapi:
+    container_name: searchApi
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
