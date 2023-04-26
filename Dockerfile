@@ -4,6 +4,6 @@ COPY pom.xml /home/app/
 RUN mvn -f /home/app clean package
 
 FROM openjdk
-COPY --from=build target/DockerElastic.jar DockerElastic.jar
+COPY --from=build /home/app/target/DockerElastic.jar /usr/local/lib/DockerElastic.jar
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "/DockerElastic.jar"]
+ENTRYPOINT ["java","-jar","/usr/local/lib/DockerElastic.jar"]

@@ -1,7 +1,7 @@
 version: '2.1'
 services:
   elasticsearch:
-    image: "taniabg/imdb:indexed_films"
+    image: "taniabg/imdb:indexed_movies"
     hostname: "elasticsearch"
     container_name: elasticsearch-docker
     environment:
