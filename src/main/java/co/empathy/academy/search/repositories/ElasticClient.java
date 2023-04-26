@@ -30,10 +30,13 @@ public class ElasticClient {
     private ElasticsearchClient client;
     private static final String INDEX = "imdb";
 
+    /**
+     * Method that connects to the Elasticsearch API Client
+     */
     private void createConnection() {
         // Create the low-level client
-        RestClient restClient = RestClient.builder(
-                new HttpHost("localhost", 9200)).build();
+        RestClient restClient = RestClient.builder(new HttpHost("localhost", 9200),
+                new HttpHost("elasticsearch", 9200)).build();
 
         // Create the transport with a Jackson mapper
         ElasticsearchTransport transport = new RestClientTransport(
@@ -44,6 +47,11 @@ public class ElasticClient {
     }
 
 
+    /**
+     * Method that return the Elasticsearch cluster name
+     *
+     * @return Elasticsearch cluster name
+     */
     public String getClusterName() {
         createConnection();
         try {
@@ -53,6 +61,12 @@ public class ElasticClient {
         }
     }
 
+    /**
+     * Method that creates a new index or deletes that it's called the same way and creates a new one.
+     * It also sets the analyzer and the mapping to the new index.
+     *
+     * @throws IOException
+     */
     public void createIndex() throws IOException {
         createConnection();
         boolean exists = client.indices().exists(ExistsRequest.of(e -> e.index(INDEX))).value();
@@ -64,6 +78,9 @@ public class ElasticClient {
         setMapping();
     }
 
+    /**
+     * Method that sets the analyzer to the index
+     */
     private void setAnalyzer() {
         try {
             client.indices().close(c -> c.index(INDEX));
@@ -75,6 +92,9 @@ public class ElasticClient {
         }
     }
 
+    /**
+     * Method that sets the mapping to the index
+     */
     private void setMapping() {
         try {
             InputStream jsonMapping = new ClassPathResource("mapping.json").getInputStream();
@@ -85,6 +105,11 @@ public class ElasticClient {
 
     }
 
+    /**
+     * Method that bulks all the movies of the parameter list to the Elasticsearch index
+     *
+     * @param movies list of movies we want to bulk
+     */
     public void bulkMovies(List<Movie> movies) {
         BulkRequest.Builder bulkRequest = new BulkRequest.Builder();
 
@@ -99,6 +124,14 @@ public class ElasticClient {
         }
     }
 
+    /**
+     * Method that executes the parameter query and returns max the parameter size objects
+     *
+     * @param query query we want the movies to match
+     * @param size  max movies we want to get
+     * @return a list of movies that match with the query
+     * @throws IOException
+     */
     public List<Object> executeQuery(Query query, int size) throws IOException {
         createConnection();
 
@@ -115,6 +148,13 @@ public class ElasticClient {
                 .toList();
     }
 
+    /**
+     * Method that executes the parameter aggregation
+     *
+     * @param aggs aggregation we want to execute
+     * @return a list of buckets of the aggregation
+     * @throws IOException
+     */
     public List<Bucket> executeAggs(Aggregation aggs) throws IOException {
         createConnection();
 

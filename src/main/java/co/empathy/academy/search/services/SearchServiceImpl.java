@@ -14,7 +14,7 @@ public class SearchServiceImpl implements SearchService {
 
     @Autowired
     private ElasticClient elastic;
-    private QueryServiceImpl queryService = new QueryServiceImpl();
+    private QueryService queryService = new QueryServiceImpl();
 
     @Override
     public String getJsonQueryAndClusterName(String query) {

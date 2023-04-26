@@ -30,10 +30,11 @@ public class MoviesController {
     })
     @Parameter(name = "file", required = true, description = "File with the movies' data")
     @PostMapping("")
-    public ResponseEntity<String> leerTsv(@RequestParam MultipartFile basics, @RequestParam MultipartFile akas,
-                                          @RequestParam MultipartFile principals, @RequestParam MultipartFile ratings,
-                                          @RequestParam MultipartFile crew) throws IOException {
+    public ResponseEntity<String> leerTsv(
+            @RequestParam MultipartFile basics, @RequestParam MultipartFile akas,
+            @RequestParam MultipartFile principals, @RequestParam MultipartFile ratings,
+            @RequestParam MultipartFile crew) throws IOException {
         int dataBasic = moviesService.readData(basics, akas, principals, ratings, crew);
-        return ResponseEntity.status(HttpStatus.OK).body("Ta to bien, de chill. ha indexado " + dataBasic + " películas");
+        return ResponseEntity.status(HttpStatus.OK).body("Se han indexado " + dataBasic + " películas");
     }
 }

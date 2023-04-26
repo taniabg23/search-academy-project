@@ -2,6 +2,11 @@ package co.empathy.academy.search.controllers;
 
 import co.empathy.academy.search.services.SearchService;
 import co.empathy.academy.search.util.Bucket;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +26,23 @@ public class QueriesIMDbController {
     @Autowired
     private SearchService searchService;
 
-    @GetMapping("/filters")
+    @Operation(summary = "Returns a list of movies filters by the filters applied")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Success"),
+            @ApiResponse(responseCode = "500", description = "A problem with Elasticsearch has occurred")
+    })
+    @Parameters(value = {
+            @Parameter(name = "yearMin", required = false, description = "Minimum startYear of the movie"),
+            @Parameter(name = "yearMax", required = false, description = "Maximum startYear of the movie"),
+            @Parameter(name = "ratingMin", required = false, description = "Minimum rating of the movie"),
+            @Parameter(name = "ratingMax", required = false, description = "Maximum rating of the movie"),
+            @Parameter(name = "minutesMin", required = false, description = "Minimum minutes of the movie"),
+            @Parameter(name = "minutesMax", required = false, description = "Maximum minutes of the movie"),
+            @Parameter(name = "type", required = false, description = "Type of the movie"),
+            @Parameter(name = "genres", required = false, description = "Genres of the movie"),
+            @Parameter(name = "values", required = false, description = "Title of the movie")
+    })
+    @GetMapping("")
     public ResponseEntity<List<Object>> searchByFilters(
             @RequestParam Optional<Integer> yearMin, @RequestParam Optional<Integer> yearMax,
             @RequestParam Optional<Double> ratingMin, @RequestParam Optional<Double> ratingMax,
@@ -36,6 +57,15 @@ public class QueriesIMDbController {
         }
     }
 
+    @Operation(summary = "Returns the movies that match the values for the filter applied")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Success"),
+            @ApiResponse(responseCode = "500", description = "A problem with Elasticsearch has occurred")
+    })
+    @Parameters(value = {
+            @Parameter(name = "field", required = true, description = "Field of the values applied"),
+            @Parameter(name = "values", required = true, description = "Values that we are looking for")
+    })
     @GetMapping("/terms")
     public ResponseEntity<List<Object>> searchByTerms(
             @RequestParam String field, @RequestParam String values) {
@@ -46,6 +76,11 @@ public class QueriesIMDbController {
         }
     }
 
+    @Operation(summary = "Returns the genres that exist for the movies")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Success"),
+            @ApiResponse(responseCode = "500", description = "A problem with Elasticsearch has occurred")
+    })
     @GetMapping("/genres")
     public ResponseEntity<List<Bucket>> getGenres() {
         try {

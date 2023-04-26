@@ -26,6 +26,17 @@ public class MoviesService {
     private static final int MAX_NUM_MOVIES = 30000;
     private List<Movie> movies = new LinkedList<>();
 
+    /**
+     * Method that reads and indexes all the IMDb files info into an Elasticsearch index
+     *
+     * @param basics     basics' file
+     * @param akas       akas' file
+     * @param principals principals' file
+     * @param ratings    ratings' file
+     * @param crew       crew's file
+     * @return number of movies indexed
+     * @throws IOException
+     */
     public int readData(MultipartFile basics, MultipartFile akas,
                         MultipartFile principals, MultipartFile ratings,
                         MultipartFile crew) throws IOException {
@@ -57,7 +68,9 @@ public class MoviesService {
                     continue;
                 }
                 tconst = valuesBasic[0];
-                basic = (nextLineBasic == null) ? getBasic(tconst, valuesBasic, null) : getBasic(tconst, valuesBasic, nextLineBasic.split("\t")[0]);
+                basic = (nextLineBasic == null)
+                        ? getMovie(tconst, valuesBasic, null)
+                        : getMovie(tconst, valuesBasic, nextLineBasic.split("\t")[0]);
                 movies.add(basic);
                 moviesReaden++;
                 totalMoviesIndexed++;
@@ -69,6 +82,16 @@ public class MoviesService {
         return totalMoviesIndexed;
     }
 
+    /**
+     * Method that inicialize the BufferedReaders of all the files and reads its headers
+     *
+     * @param basics     basics' file
+     * @param akas       akas' file
+     * @param principals principals' file
+     * @param ratings    ratings' file
+     * @param crew       crew's file
+     * @throws IOException
+     */
     private void inicializeBuffereds(MultipartFile basics, MultipartFile akas, MultipartFile principals, MultipartFile ratings, MultipartFile crew) throws IOException {
         //establecemos los bufferedreaders
         this.basicsBF = new BufferedReader(new InputStreamReader(basics.getInputStream()));
@@ -85,7 +108,16 @@ public class MoviesService {
         this.crewBF.readLine();
     }
 
-    private Movie getBasic(String tconst, String[] valuesBasic, String nextTconst) throws IOException {
+    /**
+     * Method that returns a Movie object with all its values, akas, principals and directors
+     *
+     * @param tconst      tconst of the movie we want to create
+     * @param valuesBasic values of the movie we want to create
+     * @param nextTconst  tconst of the next movie
+     * @return a complete Movie object
+     * @throws IOException
+     */
+    private Movie getMovie(String tconst, String[] valuesBasic, String nextTconst) throws IOException {
         String titleType, primaryTitle, originalTitle;
         int startYear, endYear, runTimeMinutos;
         List<String> genres;
@@ -154,14 +186,28 @@ public class MoviesService {
         titleType = valuesBasic[1];
         primaryTitle = valuesBasic[2];
         originalTitle = valuesBasic[3];
-        startYear = !(valuesBasic[5].equals("\\N")) ? Integer.parseInt(valuesBasic[5]) : 0;
-        endYear = !(valuesBasic[6].equals("\\N")) ? Integer.parseInt(valuesBasic[6]) : 0;
-        runTimeMinutos = !(valuesBasic[7].equals("\\N")) ? Integer.parseInt(valuesBasic[7]) : 0;
+        startYear = !(valuesBasic[5].equals("\\N"))
+                ? Integer.parseInt(valuesBasic[5])
+                : 0;
+        endYear = !(valuesBasic[6].equals("\\N"))
+                ? Integer.parseInt(valuesBasic[6])
+                : 0;
+        runTimeMinutos = !(valuesBasic[7].equals("\\N"))
+                ? Integer.parseInt(valuesBasic[7])
+                : 0;
         genres = List.of(valuesBasic[8].split(","));
         basic = new Movie(tconst, titleType, primaryTitle, originalTitle, false, startYear, endYear, runTimeMinutos, genres, averageRating, numVotes, akasBasic, directors, principalsBasic);
         return basic;
     }
 
+    /**
+     * Method that returns a list of the Akas of the movie with the param tconst
+     *
+     * @param tconst     tconst of the movie we want to know its akas
+     * @param nextTconst tconst of the next movie we are going to look for
+     * @return the list of the tconst movie akas
+     * @throws IOException
+     */
     private List<Aka> readAkas(String tconst, String nextTconst) throws IOException {
         List<Aka> akas = new LinkedList<>();
         this.akasBF.mark(3000);
@@ -205,6 +251,14 @@ public class MoviesService {
         return new LinkedList<>();
     }
 
+    /**
+     * Method that returns a list of the Principals of the movie with the param tconst
+     *
+     * @param tconst     tconst of the movie we want to know its principals
+     * @param nextTconst tconst of the next movie we are going to look for
+     * @return the list of the tconst movie principals
+     * @throws IOException
+     */
     private List<Principal> readPrincipals(String tconst, String nextTconst) throws IOException {
         List<Principal> principals = new LinkedList<>();
         this.principalsBF.mark(3000);
@@ -248,6 +302,12 @@ public class MoviesService {
         return new LinkedList<>();
     }
 
+    /**
+     * Method that returns a Principal object with the param values
+     *
+     * @param valuesPrincipal values of the Principal object we want to create
+     * @return a Principal object
+     */
     private Principal getPrincipal(String[] valuesPrincipal) {
         String nconst;
         Principal principal;
@@ -258,6 +318,12 @@ public class MoviesService {
         return principal;
     }
 
+    /**
+     * Method that returns an Aka object with the param values
+     *
+     * @param valuesAka values of the Aka object we want to create
+     * @return an Aka object
+     */
     private Aka getAka(String[] valuesAka) {
         String title;
         Aka aka;
@@ -267,7 +333,9 @@ public class MoviesService {
         title = valuesAka[2];
         region = valuesAka[3];
         language = valuesAka[4];
-        isOriginalTitle = valuesAka[7].equals("\\N") || Integer.parseInt(valuesAka[7]) == 0 ? false : true;
+        isOriginalTitle = valuesAka[7].equals("\\N") || Integer.parseInt(valuesAka[7]) == 0
+                ? false
+                : true;
         aka = new Aka(title, region, language, isOriginalTitle);
         return aka;
     }
