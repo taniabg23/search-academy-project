@@ -31,8 +31,23 @@ public class SearchServiceImpl implements SearchService {
     }
 
     @Override
-    public List<Object> getListMoviesSearchAllFilters(Optional<Integer> yearMin, Optional<Integer> yearMax, Optional<Double> ratingMin, Optional<Double> ratingMax, Optional<Integer> minutesMin, Optional<Integer> minutesMax, Optional<String> type, Optional<String> genres, Optional<String> values) throws IOException {
-        return elastic.executeQuery(queryService.allFiltersQuery(yearMin, yearMax, ratingMin, ratingMax, minutesMin, minutesMax, type, genres, values), 100);
+    public List<Object> getListMoviesSearchAllFilters(Optional<String> genres, Optional<String> type,
+                                                      Optional<Integer> yearMax, Optional<Integer> yearMin,
+                                                      Optional<Integer> minutesMax, Optional<Integer> minutesMin,
+                                                      Optional<Double> ratingMax, Optional<Double> ratingMin,
+                                                      Optional<Integer> size, Optional<String> sort,
+                                                      Optional<String> values) throws IOException {
+        int sizeToUse;
+        if (size.isPresent()) {
+            sizeToUse = size.get();
+        } else {
+            sizeToUse = 100;
+        }
+        if (sort.isPresent()) {
+            return elastic.executeQuery(queryService.allFiltersQuery(genres, type, yearMax, yearMin, minutesMax, minutesMin, ratingMax, ratingMin, values), sort.get(), sizeToUse);
+        } else {
+            return elastic.executeQuery(queryService.allFiltersQuery(genres, type, yearMax, yearMin, minutesMax, minutesMin, ratingMax, ratingMin, values), sizeToUse);
+        }
     }
 
     @Override

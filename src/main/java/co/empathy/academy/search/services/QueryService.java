@@ -19,18 +19,27 @@ public interface QueryService {
      * Method that creates a query for multiple bool should terms queries and range queries for all the fields
      * of a movie. Is not necessary to specify all the filters.
      *
-     * @param yearMin    Minimum startYear of the movie
-     * @param yearMax    Maximum startYear of the movie
-     * @param ratingMin  Minimum rating of the movie
-     * @param ratingMax  Maximum rating of the movie
-     * @param minutesMin Minimum minutes of the movie
-     * @param minutesMax Maximum minutes of the movie
-     * @param type       Type of the movie
      * @param genres     Genres of the movie
+     * @param type       Type of the movie
+     * @param yearMax    Maximum startYear of the movie
+     * @param yearMin    Minimum startYear of the movie
+     * @param minutesMax Maximum minutes of the movie
+     * @param minutesMin Minimum minutes of the movie
+     * @param ratingMax  Maximum rating of the movie
+     * @param ratingMin  Minimum rating of the movie
      * @param values     Title of the movie
-     * @return an all filters query
+     * @return
      */
-    Query allFiltersQuery(Optional<Integer> yearMin, Optional<Integer> yearMax, Optional<Double> ratingMin, Optional<Double> ratingMax, Optional<Integer> minutesMin, Optional<Integer> minutesMax, Optional<String> type, Optional<String> genres, Optional<String> values);
+    Query allFiltersQuery(Optional<String> genres,
+                          Optional<String> type,
+                          Optional<Integer> yearMax,
+                          Optional<Integer> yearMin,
+                          Optional<Integer> minutesMax,
+                          Optional<Integer> minutesMin,
+                          Optional<Double> ratingMax,
+                          Optional<Double> ratingMin,
+                          Optional<String> values);
+
 
     /**
      * Method that returns all the existing movie genres

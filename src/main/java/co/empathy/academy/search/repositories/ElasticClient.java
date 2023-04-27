@@ -1,6 +1,9 @@
 package co.empathy.academy.search.repositories;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.FieldSort;
+import co.elastic.clients.elasticsearch._types.SortOptions;
+import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch._types.aggregations.Aggregation;
 import co.elastic.clients.elasticsearch._types.aggregations.StringTermsBucket;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
@@ -139,7 +142,37 @@ public class ElasticClient {
                 .index(INDEX)
                 .query(query)
                 .size(size));
-        System.out.println(searchRequest.toString());
+
+        SearchResponse<Object> response = client.search(searchRequest, Object.class);
+
+        return response.hits().hits().stream()
+                .map(Hit::source)
+                .toList();
+    }
+
+    /**
+     * Method that executes the parameter query and returns max the parameter size objects and sort the results
+     *
+     * @param query query we want the movies to match
+     * @param sort  wich field they are sorted by
+     * @param size  max movies we want to get
+     * @return a list of movies that match with the query
+     * @throws IOException
+     */
+    public List<Object> executeQuery(Query query, String sort, int size) throws IOException {
+        createConnection();
+
+        SortOptions sortOptions = SortOptions.of(
+                s -> s.field(
+                        FieldSort.of(
+                                f -> f.field(sort).
+                                        order(SortOrder.Desc))));
+
+        SearchRequest searchRequest = SearchRequest.of(s -> s
+                .index(INDEX)
+                .query(query)
+                .sort(sortOptions)
+                .size(size));
 
         SearchResponse<Object> response = client.search(searchRequest, Object.class);
 

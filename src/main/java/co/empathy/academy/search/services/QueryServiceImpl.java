@@ -30,25 +30,12 @@ public class QueryServiceImpl implements QueryService {
         return boolQuery;
     }
 
-    /**
-     * Method that creates a range Query fot the parameter field with the parameter values
-     *
-     * @param field field of the range
-     * @param low   minimum value of the field
-     * @param high  maximum value of the field
-     * @return a range query
-     */
-    private Query queryRange(String field, int low, int high) {
-        Query queryRange = RangeQuery.of(r -> r.
-                        field(field).
-                        gte(JsonData.of(low)).
-                        lte(JsonData.of(high))).
-                _toQuery();
-        return queryRange;
-    }
-
     @Override
-    public Query allFiltersQuery(Optional<Integer> yearMin, Optional<Integer> yearMax, Optional<Double> ratingMin, Optional<Double> ratingMax, Optional<Integer> minutesMin, Optional<Integer> minutesMax, Optional<String> type, Optional<String> genres, Optional<String> values) {
+    public Query allFiltersQuery(Optional<String> genres, Optional<String> type, Optional<Integer> yearMax,
+                                 Optional<Integer> yearMin, Optional<Integer> minutesMax,
+                                 Optional<Integer> minutesMin, Optional<Double> ratingMax,
+                                 Optional<Double> ratingMin, Optional<String> values) {
+
         List<Query> queries = new LinkedList<>();
 
         int yearMinValue, yearMaxValue, minutesMinValue, minutesMaxValue;
@@ -100,10 +87,27 @@ public class QueryServiceImpl implements QueryService {
                     _toQuery());
         }
 
-
         Query mustQuery = BoolQuery.of(b -> b.must(queries))._toQuery();
         return mustQuery;
     }
+
+    /**
+     * Method that creates a range Query fot the parameter field with the parameter values
+     *
+     * @param field field of the range
+     * @param low   minimum value of the field
+     * @param high  maximum value of the field
+     * @return a range query
+     */
+    private Query queryRange(String field, int low, int high) {
+        Query queryRange = RangeQuery.of(r -> r.
+                        field(field).
+                        gte(JsonData.of(low)).
+                        lte(JsonData.of(high))).
+                _toQuery();
+        return queryRange;
+    }
+
 
     @Override
     public Aggregation getGenres() {

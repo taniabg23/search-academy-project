@@ -32,26 +32,29 @@ public class QueriesIMDbController {
             @ApiResponse(responseCode = "500", description = "A problem with Elasticsearch has occurred")
     })
     @Parameters(value = {
-            @Parameter(name = "yearMin", required = false, description = "Minimum startYear of the movie"),
-            @Parameter(name = "yearMax", required = false, description = "Maximum startYear of the movie"),
-            @Parameter(name = "ratingMin", required = false, description = "Minimum rating of the movie"),
-            @Parameter(name = "ratingMax", required = false, description = "Maximum rating of the movie"),
-            @Parameter(name = "minutesMin", required = false, description = "Minimum minutes of the movie"),
-            @Parameter(name = "minutesMax", required = false, description = "Maximum minutes of the movie"),
-            @Parameter(name = "type", required = false, description = "Type of the movie"),
             @Parameter(name = "genres", required = false, description = "Genres of the movie"),
+            @Parameter(name = "type", required = false, description = "Type of the movie"),
+            @Parameter(name = "yearMax", required = false, description = "Maximum startYear of the movie"),
+            @Parameter(name = "yearMin", required = false, description = "Minimum startYear of the movie"),
+            @Parameter(name = "minutesMax", required = false, description = "Maximum minutes of the movie"),
+            @Parameter(name = "minutesMin", required = false, description = "Minimum minutes of the movie"),
+            @Parameter(name = "ratingMax", required = false, description = "Maximum rating of the movie"),
+            @Parameter(name = "ratingMin", required = false, description = "Minimum rating of the movie"),
+            @Parameter(name = "size", required = false, description = "Maximum number of results"),
+            @Parameter(name = "sort", required = false, description = "How are the results sorted"),
             @Parameter(name = "values", required = false, description = "Title of the movie")
     })
     @GetMapping("")
     public ResponseEntity<List<Object>> searchByFilters(
-            @RequestParam Optional<Integer> yearMin, @RequestParam Optional<Integer> yearMax,
-            @RequestParam Optional<Double> ratingMin, @RequestParam Optional<Double> ratingMax,
-            @RequestParam Optional<Integer> minutesMin, @RequestParam Optional<Integer> minutesMax,
-            @RequestParam Optional<String> type, @RequestParam Optional<String> genres,
+            @RequestParam Optional<String> genres, @RequestParam Optional<String> type,
+            @RequestParam Optional<Integer> yearMax, @RequestParam Optional<Integer> yearMin,
+            @RequestParam Optional<Integer> minutesMax, @RequestParam Optional<Integer> minutesMin,
+            @RequestParam Optional<Double> ratingMax, @RequestParam Optional<Double> ratingMin,
+            @RequestParam Optional<Integer> size, @RequestParam Optional<String> sort,
             @RequestParam Optional<String> values) {
         try {
             System.out.println(1);
-            return ResponseEntity.status(HttpStatus.OK).body(searchService.getListMoviesSearchAllFilters(yearMin, yearMax, ratingMin, ratingMax, minutesMin, minutesMax, type, genres, values));
+            return ResponseEntity.status(HttpStatus.OK).body(searchService.getListMoviesSearchAllFilters(genres, type, yearMax, yearMin, minutesMax, minutesMin, ratingMax, ratingMin, size, sort, values));
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }

@@ -41,7 +41,17 @@ public interface SearchService {
      * @return a list of the movies that match
      * @throws IOException
      */
-    List<Object> getListMoviesSearchAllFilters(Optional<Integer> yearMin, Optional<Integer> yearMax, Optional<Double> ratingMin, Optional<Double> ratingMax, Optional<Integer> minutesMin, Optional<Integer> minutesMax, Optional<String> type, Optional<String> genres, Optional<String> values) throws IOException;
+    List<Object> getListMoviesSearchAllFilters(Optional<String> genres,
+                                               Optional<String> type,
+                                               Optional<Integer> yearMax,
+                                               Optional<Integer> yearMin,
+                                               Optional<Integer> minutesMax,
+                                               Optional<Integer> minutesMin,
+                                               Optional<Double> ratingMax,
+                                               Optional<Double> ratingMin,
+                                               Optional<Integer> size,
+                                               Optional<String> sort,
+                                               Optional<String> values) throws IOException;
 
     /**
      * Method that return a list of buckets of the genres of the movies
